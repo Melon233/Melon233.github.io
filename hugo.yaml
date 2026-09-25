@@ -68,7 +68,9 @@ params:
   ShowBreadCrumbs: true
   ShowCodeCopyButtons: true
   ShowWordCount: true
-  ShowRssButtonInSectionTermList: true
+  # 关闭列表页标题旁的 RSS 图标（它会跳转到 index.xml）。
+  # 注意：head 中的 <link rel="alternate"> 订阅声明不受此影响，仍然保留。
+  ShowRssButtonInSectionTermList: false
   UseHugoToc: true
   disableSpecial1stPost: true
   disableScrollToTop: false
