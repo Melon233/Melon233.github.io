@@ -342,7 +342,69 @@ body > .footer {
     box-sizing: border-box;
 }
 
-/* ---------- 8. 响应式 ---------- */
+/* ---------- 8. 文章详情页 ---------- */
+
+/*
+   返回主页按钮（替代原面包屑 Home > Posts）
+*/
+.back-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-bottom: 0.9rem;
+    padding: 0.28rem 0.7rem 0.28rem 0.5rem;
+    font-size: 0.8rem;
+    color: var(--secondary);
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    text-decoration: none;
+    transition: color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.back-home svg {
+    width: 15px;
+    height: 15px;
+    transition: transform 0.18s ease;
+}
+
+.back-home:hover {
+    color: var(--primary);
+    border-color: var(--secondary);
+}
+
+/* 悬停时箭头向左轻移，强化「返回」的方向暗示 */
+.back-home:hover svg {
+    transform: translateX(-2px);
+}
+
+/*
+   详情页底部标签：复用主页 .home-tag 的外观，
+   并覆盖主题 .post-tags a 的圆角矩形样式。
+*/
+.post-tags .post-tag-link,
+.post-tags .post-tag-link:hover {
+    border-radius: 999px;
+    background: var(--entry);
+    line-height: 1.5;
+    font-size: 0.76rem;
+    padding: 0.18rem 0.6rem;
+    text-decoration: none;
+}
+
+.post-tags .post-tag-link:hover {
+    color: var(--primary);
+    border-color: var(--secondary);
+    background: var(--entry);
+}
+
+/* 主题把 .post-tags li 设为 inline-block，与胶囊间距叠加后略紧，统一交给 gap */
+.post-tags {
+    gap: 0.4rem;
+    margin-top: 0.2rem;
+}
+
+/* ---------- 9. 响应式 ---------- */
 @media (max-width: 768px) {
     .home-wrap {
         padding: 0.5rem 0 2.5rem;

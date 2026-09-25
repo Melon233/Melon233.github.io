@@ -106,6 +106,35 @@
         /* 当前选中的标签集合（小写，避免大小写差异导致漏匹配） */
         var activeTags = [];
 
+        /* ---------- 从 URL 读取预选标签 ----------
+           文章详情页的标签链接会带上 ?tag=xxx，回到首页时自动选中。
+           支持 ?tag=a&tag=b 或 ?tag=a,b 两种写法。 */
+        function readTagsFromURL() {
+            var raw = [];
+            try {
+                var params = new URLSearchParams(window.location.search);
+                raw = params.getAll('tag');
+                if (raw.length === 0) {
+                    var single = params.get('tags');
+                    if (single) raw = single.split(',');
+                }
+            } catch (e) { /* 老浏览器降级：忽略参数 */ }
+
+            return raw
+                .map(function (t) { return t.trim().toLowerCase(); })
+                .filter(Boolean);
+        }
+
+        /* 把当前选中状态写回 URL，便于分享与刷新保持 */
+        function syncURL() {
+            if (!window.history || !window.history.replaceState) return;
+            var qs = activeTags
+                .map(function (t) { return 'tag=' + encodeURIComponent(t); })
+                .join('&');
+            var url = window.location.pathname + (qs ? '?' + qs : '');
+            window.history.replaceState(null, '', url);
+        }
+
         function postMatchesTags(post) {
             if (activeTags.length === 0) return true;
             var owned = (post.dataset.tags || '')
@@ -162,8 +191,23 @@
                     btn.setAttribute('aria-pressed', 'false');
                 }
                 apply();
+                syncURL();
             });
         });
+
+        /* ---------- 初始化：应用 URL 里的预选标签 ---------- */
+        readTagsFromURL().forEach(function (tag) {
+            var btn = tagBtns.find(function (b) {
+                return (b.dataset.tag || '').toLowerCase() === tag;
+            });
+            if (btn && activeTags.indexOf(tag) === -1) {
+                activeTags.push(tag);
+                btn.classList.add('is-active');
+                btn.setAttribute('aria-pressed', 'true');
+            }
+        });
+        apply();
+        syncURL();
     })();
 </script>
 
