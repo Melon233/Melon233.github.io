@@ -4,9 +4,9 @@
 #    2. params.author / params.homeInfoParams 里的个人信息
 # ============================================================
 
-baseURL: "https://YOUR_USERNAME.github.io/"
+baseURL: "https://Melon233.github.io/"
 languageCode: "zh-cn"
-title: "Karon 的技术笔记"
+title: "Chino 的技术笔记"
 theme: "PaperMod"
 
 # 让 URL 保持干净的 /posts/xxx/ 形式
@@ -27,12 +27,30 @@ minify:
   disableXML: true
   minifyOutput: true
 
+# ---------- 版权（页脚）----------
+# copyright 留空即可：页脚模板会按「建站年–当前年」自动生成
+#   建站当年（同年） → “© 2026 Chino. All rights reserved.”
+#   之后每一年       → “© 2026–2027 Chino. All rights reserved.”
+# 跨年无需手改。若想完全自定义文案，直接填写 copyright，模板会优先使用它。
+copyright: ""
+
 params:
   env: production
-  title: "Karon 的技术笔记"
+
+  # ---------- 建站年份 ----------
+  # 本站首次发布的年份。版权年份区间 = startYear–当前年份。
+  # 起始年与当前年相同时只显示一个年份。
+  startYear: 2026
+
+  title: "Chino 的技术笔记"
   description: "记录学习过程中的踩坑与总结"
   keywords: [Blog, 技术笔记, 编程]
-  author: "Karon"
+  author: "Chino"
+
+  # ---------- 页脚 ----------
+  # 只保留版权；hideCopyright: false 显示上面那行 copyright
+  footer:
+    hideCopyright: false
 
   # 默认主题色：auto 跟随系统，也可写 light / dark
   defaultTheme: auto
@@ -52,7 +70,7 @@ params:
 
   # ---------- 首页顶部的大标题区 ----------
   homeInfoParams:
-    Title: "你好，我是 Karon 👋"
+    Title: "你好，我是 Chino 👋"
     Content: >
       这里记录我在编程、工具链和折腾过程中的学习笔记。
       想到什么写什么，主要是为了让自己记得住。
@@ -60,7 +78,7 @@ params:
   # ---------- 社交图标（不需要的删掉即可）----------
   socialIcons:
     - name: github
-      url: "https://github.com/YOUR_USERNAME"
+      url: "https://github.com/Melon233"
     - name: rss
       url: "index.xml"
 
@@ -98,6 +116,10 @@ menu:
       name: 搜索
       url: /search/
       weight: 40
+    - identifier: about
+      name: 关于
+      url: /about/
+      weight: 50
 
 # ---------- 生成搜索索引 + 分类页 ----------
 outputs:
