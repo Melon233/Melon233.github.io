@@ -238,6 +238,15 @@
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
+/*
+   关键：.home-posts 是 flex 容器，flex 子项的 display 由布局接管，
+   浏览器对 [hidden] 的默认 display:none 会被覆盖，导致筛选后文章
+   仍然可见。必须显式声明，标签/搜索过滤才会真正生效。
+*/
+.home-post[hidden] {
+    display: none;
+}
+
 .home-post:hover {
     border-color: var(--primary);
     transform: translateY(-1px);
