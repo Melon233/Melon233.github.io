@@ -1,0 +1,111 @@
+# ============================================================
+#  Hugo 站点配置 —— 部署到 GitHub Pages 前必改的两处：
+#    1. baseURL  -> https://<你的GitHub用户名>.github.io/
+#    2. params.author / params.homeInfoParams 里的个人信息
+# ============================================================
+
+baseURL: "https://YOUR_USERNAME.github.io/"
+languageCode: "zh-cn"
+title: "Karon 的技术笔记"
+theme: "PaperMod"
+
+# 让 URL 保持干净的 /posts/xxx/ 形式
+permalinks:
+  posts: "/posts/:slug/"
+
+# 首页显示最近的 N 篇
+pagination:
+  pagerSize: 10
+
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+
+# ---------- 压缩输出，让 Pages 加载更快 ----------
+minify:
+  disableXML: true
+  minifyOutput: true
+
+params:
+  env: production
+  title: "Karon 的技术笔记"
+  description: "记录学习过程中的踩坑与总结"
+  keywords: [Blog, 技术笔记, 编程]
+  author: "Karon"
+
+  # 默认主题色：auto 跟随系统，也可写 light / dark
+  defaultTheme: auto
+  disableThemeToggle: false
+
+  ShowReadingTime: true
+  ShowShareButtons: false
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowWordCount: true
+  ShowRssButtonInSectionTermList: true
+  UseHugoToc: true
+  disableSpecial1stPost: false
+  disableScrollToTop: false
+  comments: false
+
+  # ---------- 首页顶部的大标题区 ----------
+  homeInfoParams:
+    Title: "你好，我是 Karon 👋"
+    Content: >
+      这里记录我在编程、工具链和折腾过程中的学习笔记。
+      想到什么写什么，主要是为了让自己记得住。
+
+  # ---------- 社交图标（不需要的删掉即可）----------
+  socialIcons:
+    - name: github
+      url: "https://github.com/YOUR_USERNAME"
+    - name: rss
+      url: "index.xml"
+
+  # ---------- 文章目录设置 ----------
+  assets:
+    disableHLJS: true      # 用 Hugo 内置高亮，不额外加载 highlight.js
+    favicon: "/favicon.ico"
+
+  # ---------- 本地搜索（PaperMod 内置，基于 JSON 索引）----------
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 0
+    keys: ["title", "permalink", "summary", "content"]
+
+# ---------- 顶部菜单 ----------
+menu:
+  main:
+    - identifier: posts
+      name: 文章
+      url: /posts/
+      weight: 10
+    - identifier: archives
+      name: 归档
+      url: /archives/
+      weight: 20
+    - identifier: tags
+      name: 标签
+      url: /tags/
+      weight: 30
+    - identifier: search
+      name: 搜索
+      url: /search/
+      weight: 40
+
+# ---------- 生成搜索索引 + 分类页 ----------
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON      # 搜索功能依赖这个
+
+taxonomies:
+  tag: tags
+  category: categories
