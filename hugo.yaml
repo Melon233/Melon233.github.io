@@ -11,7 +11,9 @@ theme: "PaperMod"
 permalinks:
   posts: "/posts/:slug/"
 
-# 首页显示最近的 N 篇
+# 分页设置
+# 注意：首页是自定义布局（layouts/home.html），它一次性列出全部文章、不做分页，
+# 以便搜索和标签筛选能覆盖所有内容。此处的 pagerSize 只影响 /posts/ 等列表页。
 pagination:
   pagerSize: 10
 

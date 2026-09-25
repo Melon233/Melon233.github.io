@@ -301,10 +301,42 @@
     justify-content: flex-end;
 }
 
-/* ---------- 7. 响应式 ---------- */
+/* ---------- 7. 页脚沉底 ---------- */
+/*
+   主题原本靠 .main 的 min-height 撑开高度，但它是用
+   calc(100vh - header - footer) 估算的，footer 实际高度随内容变化，
+   算出来总会差一点，导致内容少时版权不贴底。
+
+   改为整体 flex 布局：body 至少占满视口，main 占据剩余空间，
+   footer 自然被推到底部。这样无论内容多少都能正确沉底。
+*/
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* main 吃掉剩余空间，把 footer 顶到底部 */
+body > .main {
+    flex: 1 0 auto;
+    /* 撤销主题的 min-height 估算，改由 flex 决定 */
+    min-height: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* footer 保持自身高度，不被压缩 */
+body > .footer {
+    flex: none;
+    margin-top: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ---------- 8. 响应式 ---------- */
 @media (max-width: 768px) {
     .home-wrap {
-        padding: 2rem 0 3rem;
+        padding: 0.5rem 0 2.5rem;
     }
 
     .home-avatar {
