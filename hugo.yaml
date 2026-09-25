@@ -92,13 +92,10 @@ params:
     keys: ["title", "permalink", "summary", "content"]
 
 # ---------- 顶部菜单 ----------
-# 首页改为自定义布局后，导航由 home.html 自行渲染，这里只保留搜索页入口。
+# 首页为自定义布局，导航区不需要任何入口（文章列表已内嵌在首页）。
+# 若以后要加菜单项，在此处追加即可，header 会自动渲染。
 menu:
-  main:
-    - identifier: posts
-      name: 文章
-      url: /posts/
-      weight: 10
+  main: []
 
 # ---------- 生成搜索索引 ----------
 outputs:

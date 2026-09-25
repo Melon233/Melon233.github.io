@@ -4,7 +4,9 @@
     自定义首页布局
     ------------------------------------------------------------
     垂直居中排列：头像 → 昵称 → 搜索框 → 标签 → 文章列表
-    头像点击跳转 GitHub。搜索框为本页内联，实时过滤下方文章列表。
+    · 头像点击跳转 GitHub
+    · 搜索框实时过滤文章（匹配标题/摘要/标签）
+    · 标签按钮本地多选过滤，与搜索条件叠加生效（AND 关系）
 */}}
 
 {{- $gh := site.Params.githubUser }}
@@ -41,15 +43,16 @@
         </button>
     </div>
 
-    {{/* ---------- 标签云 ---------- */}}
+    {{/* ---------- 标签（本地多选过滤，不跳转）---------- */}}
     {{- $tags := site.Taxonomies.tags }}
     {{- if $tags }}
-    <nav class="home-tags" aria-label="标签">
+    <nav class="home-tags" aria-label="标签筛选">
         {{- range $tags.ByCount }}
-        <a class="home-tag" href="{{ .Page.RelPermalink }}">
-            <span class="home-tag-name">{{ .Page.LinkTitle }}</span>
+        <button type="button" class="home-tag" data-tag="{{ .Page.LinkTitle }}"
+            aria-pressed="false" title="筛选「{{ .Page.LinkTitle }}」">
+            <span class="home-tag-name">#{{ .Page.LinkTitle }}</span>
             <span class="home-tag-count">{{ .Count }}</span>
-        </a>
+        </button>
         {{- end }}
     </nav>
     {{- end }}
@@ -61,12 +64,15 @@
     <div class="home-posts" id="home-posts">
         {{- if $posts }}
         {{- range $posts }}
-        <article class="home-post" data-search="{{ .Title | plainify }} {{ .Summary | plainify }} {{ delimit (.Params.tags | default slice) " " }}">
+        {{- $postTags := .Params.tags | default slice }}
+        <article class="home-post"
+            data-search="{{ .Title | plainify }} {{ .Summary | plainify }} {{ delimit $postTags " " }}"
+            data-tags="{{ delimit $postTags "|" }}">
             <a class="home-post-link" href="{{ .RelPermalink }}">
                 <h2 class="home-post-title">{{ .Title }}</h2>
                 <div class="home-post-meta">
                     <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format ":date_long" }}</time>
-                    {{- with .Params.tags }}
+                    {{- with $postTags }}
                     <span class="home-post-tags">
                         {{- range . }}<span class="home-post-tag">#{{ . }}</span>{{ end }}
                     </span>
@@ -83,8 +89,8 @@
         {{- end }}
     </div>
 
-    {{/* ---------- 搜索无结果时的提示 ---------- */}}
-    <p class="home-no-result" id="home-no-result" hidden>没有匹配的文章。</p>
+    {{/* ---------- 无结果提示 ---------- */}}
+    <p class="home-no-result" id="home-no-result" hidden>没有符合条件的文章。</p>
 
 </div>
 
@@ -92,31 +98,71 @@
     (function () {
         var input = document.getElementById('home-search-input');
         var clearBtn = document.getElementById('home-search-clear');
-        var posts = Array.prototype.slice.call(document.querySelectorAll('.home-post'));
         var noResult = document.getElementById('home-no-result');
+        var tagBtns = Array.prototype.slice.call(document.querySelectorAll('.home-tag'));
+        var posts = Array.prototype.slice.call(document.querySelectorAll('.home-post'));
         if (!input) return;
+
+        /* 当前选中的标签集合（小写，避免大小写差异导致漏匹配） */
+        var activeTags = [];
+
+        function postMatchesTags(post) {
+            if (activeTags.length === 0) return true;
+            var owned = (post.dataset.tags || '')
+                .split('|')
+                .map(function (t) { return t.trim().toLowerCase(); })
+                .filter(Boolean);
+            /* 交集逻辑：文章必须同时具备所有选中的标签 */
+            return activeTags.every(function (t) { return owned.indexOf(t) !== -1; });
+        }
 
         function apply() {
             var q = input.value.trim().toLowerCase();
             clearBtn.hidden = q === '';
+
             var hits = 0;
             posts.forEach(function (p) {
-                var hit = q === '' || (p.dataset.search || '').toLowerCase().indexOf(q) !== -1;
+                var matchText = q === '' || (p.dataset.search || '').toLowerCase().indexOf(q) !== -1;
+                var matchTag = postMatchesTags(p);
+                var hit = matchText && matchTag;
                 p.hidden = !hit;
                 if (hit) hits++;
             });
-            noResult.hidden = !(q !== '' && hits === 0);
+
+            /* 只在确实有筛选条件时才提示无结果，避免空站点误报 */
+            var filtering = q !== '' || activeTags.length > 0;
+            noResult.hidden = !(filtering && hits === 0);
         }
 
+        /* ---------- 搜索 ---------- */
         input.addEventListener('input', apply);
+
         clearBtn.addEventListener('click', function () {
             input.value = '';
             input.focus();
             apply();
         });
-        // 按 Esc 清空
+
         input.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') { input.value = ''; apply(); }
+        });
+
+        /* ---------- 标签多选 ---------- */
+        tagBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var tag = (btn.dataset.tag || '').toLowerCase();
+                var idx = activeTags.indexOf(tag);
+                if (idx === -1) {
+                    activeTags.push(tag);
+                    btn.classList.add('is-active');
+                    btn.setAttribute('aria-pressed', 'true');
+                } else {
+                    activeTags.splice(idx, 1);
+                    btn.classList.remove('is-active');
+                    btn.setAttribute('aria-pressed', 'false');
+                }
+                apply();
+            });
         });
     })();
 </script>
