@@ -91,21 +91,15 @@
 </script>
 {{- end }}
 
-{{- if (not site.Params.disableThemeToggle) }}
+{{/*
+    主题切换按钮已移除，站点固定暗色。
+    这里清掉浏览器里可能残留的旧主题偏好——否则老访客的 localStorage
+    里若存着 "light"，会覆盖 html 上的 data-theme="dark"。
+*/}}
 <script>
-    document.getElementById("theme-toggle").addEventListener("click", () => {
-        const html = document.querySelector("html");
-        if (html.dataset.theme === "dark") {
-            html.dataset.theme = 'light';
-            localStorage.setItem("pref-theme", 'light');
-        } else {
-            html.dataset.theme = 'dark';
-            localStorage.setItem("pref-theme", 'dark');
-        }
-    })
-
+    try { localStorage.removeItem("pref-theme"); } catch (e) { }
+    document.documentElement.dataset.theme = "dark";
 </script>
-{{- end }}
 
 {{- if (and (eq .Kind "page") (ne .Layout "archives") (ne .Layout "search") (.Param "ShowCodeCopyButtons")) }}
 <script>

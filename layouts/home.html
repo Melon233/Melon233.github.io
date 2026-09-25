@@ -1,0 +1,124 @@
+{{- define "main" }}
+
+{{/*
+    自定义首页布局
+    ------------------------------------------------------------
+    垂直居中排列：头像 → 昵称 → 搜索框 → 标签 → 文章列表
+    头像点击跳转 GitHub。搜索框为本页内联，实时过滤下方文章列表。
+*/}}
+
+{{- $gh := site.Params.githubUser }}
+
+<div class="home-wrap">
+
+    {{/* ---------- 头像（点击跳转 GitHub）---------- */}}
+    {{- if $gh }}
+    <a class="home-avatar" href="https://github.com/{{ $gh }}" target="_blank" rel="noopener noreferrer me"
+        aria-label="GitHub 主页" title="GitHub">
+        <img src="https://github.com/{{ $gh }}.png" alt="{{ site.Params.author }}" loading="eager"
+            onerror="this.onerror=null;this.src='{{ "favicon-192x192.png" | absURL }}';">
+    </a>
+    {{- end }}
+
+    {{/* ---------- 昵称 ---------- */}}
+    <h1 class="home-name">{{ site.Params.author | default site.Title }}</h1>
+
+    {{/* ---------- 搜索框 ---------- */}}
+    <div class="home-search">
+        <svg class="home-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input id="home-search-input" type="search" placeholder="搜索文章…" autocomplete="off"
+            aria-label="搜索文章" spellcheck="false">
+        <button id="home-search-clear" class="home-search-clear" type="button" aria-label="清空" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
+
+    {{/* ---------- 标签云 ---------- */}}
+    {{- $tags := site.Taxonomies.tags }}
+    {{- if $tags }}
+    <nav class="home-tags" aria-label="标签">
+        {{- range $tags.ByCount }}
+        <a class="home-tag" href="{{ .Page.RelPermalink }}">
+            <span class="home-tag-name">{{ .Page.LinkTitle }}</span>
+            <span class="home-tag-count">{{ .Count }}</span>
+        </a>
+        {{- end }}
+    </nav>
+    {{- end }}
+
+    {{/* ---------- 文章列表 ---------- */}}
+    {{- $posts := where site.RegularPages "Type" "in" site.Params.mainSections }}
+    {{- $posts = where $posts "Params.hiddenInHomeList" "!=" "true" }}
+
+    <div class="home-posts" id="home-posts">
+        {{- if $posts }}
+        {{- range $posts }}
+        <article class="home-post" data-search="{{ .Title | plainify }} {{ .Summary | plainify }} {{ delimit (.Params.tags | default slice) " " }}">
+            <a class="home-post-link" href="{{ .RelPermalink }}">
+                <h2 class="home-post-title">{{ .Title }}</h2>
+                <div class="home-post-meta">
+                    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format ":date_long" }}</time>
+                    {{- with .Params.tags }}
+                    <span class="home-post-tags">
+                        {{- range . }}<span class="home-post-tag">#{{ . }}</span>{{ end }}
+                    </span>
+                    {{- end }}
+                </div>
+                {{- if .Summary }}
+                <p class="home-post-summary">{{ .Summary | plainify | htmlUnescape | truncate 140 }}</p>
+                {{- end }}
+            </a>
+        </article>
+        {{- end }}
+        {{- else }}
+        <p class="home-empty">还没有文章。</p>
+        {{- end }}
+    </div>
+
+    {{/* ---------- 搜索无结果时的提示 ---------- */}}
+    <p class="home-no-result" id="home-no-result" hidden>没有匹配的文章。</p>
+
+</div>
+
+<script>
+    (function () {
+        var input = document.getElementById('home-search-input');
+        var clearBtn = document.getElementById('home-search-clear');
+        var posts = Array.prototype.slice.call(document.querySelectorAll('.home-post'));
+        var noResult = document.getElementById('home-no-result');
+        if (!input) return;
+
+        function apply() {
+            var q = input.value.trim().toLowerCase();
+            clearBtn.hidden = q === '';
+            var hits = 0;
+            posts.forEach(function (p) {
+                var hit = q === '' || (p.dataset.search || '').toLowerCase().indexOf(q) !== -1;
+                p.hidden = !hit;
+                if (hit) hits++;
+            });
+            noResult.hidden = !(q !== '' && hits === 0);
+        }
+
+        input.addEventListener('input', apply);
+        clearBtn.addEventListener('click', function () {
+            input.value = '';
+            input.focus();
+            apply();
+        });
+        // 按 Esc 清空
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') { input.value = ''; apply(); }
+        });
+    })();
+</script>
+
+{{- end }}

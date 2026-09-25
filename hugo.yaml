@@ -1,7 +1,5 @@
 # ============================================================
-#  Hugo 站点配置 —— 部署到 GitHub Pages 前必改的两处：
-#    1. baseURL  -> https://<你的GitHub用户名>.github.io/
-#    2. params.author / params.homeInfoParams 里的个人信息
+#  Hugo 站点配置
 # ============================================================
 
 baseURL: "https://Melon233.github.io/"
@@ -47,14 +45,20 @@ params:
   keywords: [Blog, 技术笔记, 编程]
   author: "Chino"
 
+  # ---------- GitHub 用户名 ----------
+  # 首页头像直接引用 GitHub 头像，换头像时博客自动跟随。
+  githubUser: "Melon233"
+
   # ---------- 页脚 ----------
-  # 只保留版权；hideCopyright: false 显示上面那行 copyright
   footer:
     hideCopyright: false
 
-  # 默认主题色：auto 跟随系统，也可写 light / dark
-  defaultTheme: auto
-  disableThemeToggle: false
+  # ---------- 主题 ----------
+  # 固定暗色，并移除右上角的切换按钮与左侧站点标题链接。
+  defaultTheme: dark
+  disableThemeToggle: true
+  # 隐藏 header 里的站点标题文字，让左上角保持干净
+  hideHeaderTitle: true
 
   ShowReadingTime: true
   ShowShareButtons: false
@@ -64,23 +68,13 @@ params:
   ShowWordCount: true
   ShowRssButtonInSectionTermList: true
   UseHugoToc: true
-  disableSpecial1stPost: false
+  disableSpecial1stPost: true
   disableScrollToTop: false
   comments: false
 
-  # ---------- 首页顶部的大标题区 ----------
-  homeInfoParams:
-    Title: "你好，我是 Chino 👋"
-    Content: >
-      这里记录我在编程、工具链和折腾过程中的学习笔记。
-      想到什么写什么，主要是为了让自己记得住。
-
-  # ---------- 社交图标（不需要的删掉即可）----------
-  socialIcons:
-    - name: github
-      url: "https://github.com/Melon233"
-    - name: rss
-      url: "index.xml"
+  # ---------- 首页改为自定义布局 ----------
+  # homeInfoParams 留空：不再显示「你好，我是 Chino」那段文案。
+  # 首页内容由 layouts/home.html 接管。
 
   # ---------- 文章目录设置 ----------
   assets:
@@ -98,30 +92,15 @@ params:
     keys: ["title", "permalink", "summary", "content"]
 
 # ---------- 顶部菜单 ----------
+# 首页改为自定义布局后，导航由 home.html 自行渲染，这里只保留搜索页入口。
 menu:
   main:
     - identifier: posts
       name: 文章
       url: /posts/
       weight: 10
-    - identifier: archives
-      name: 归档
-      url: /archives/
-      weight: 20
-    - identifier: tags
-      name: 标签
-      url: /tags/
-      weight: 30
-    - identifier: search
-      name: 搜索
-      url: /search/
-      weight: 40
-    - identifier: about
-      name: 关于
-      url: /about/
-      weight: 50
 
-# ---------- 生成搜索索引 + 分类页 ----------
+# ---------- 生成搜索索引 ----------
 outputs:
   home:
     - HTML
