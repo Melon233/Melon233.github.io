@@ -91,6 +91,71 @@ cd my-blog
 
 打开 <http://localhost:1313>。改文件会实时刷新，`Ctrl+C` 停止。
 
+### 从 Notion 导入文章
+
+如果习惯在 Notion 里写作，可以用转换脚本发布。流程：
+
+**1. 在 Notion 里导出**
+
+页面右上角 `⋯` → **Export** → 格式选 **Markdown & CSV** → 导出得到 zip。
+
+> ⚠️ 一定要选「Markdown & CSV」，不要选「Markdown」。前者是 zip 包，
+> 图片会作为独立文件一起导出；后者会把内容塞进单个文件，图片仍是外链。
+
+**2. 解压到 `_inbox/`**
+
+```bash
+cd my-blog
+unzip ~/Downloads/导出文件.zip -d _inbox/
+```
+
+**3. 预览转换结果**
+
+```bash
+python3 tools/notion_import.py --dry-run
+```
+
+这一步**不写入文件、不下载图片**，只显示每篇会被转成什么样子。
+建议先跑一次，确认标题、slug、摘要符合预期。
+
+**4. 执行转换**
+
+```bash
+python3 tools/notion_import.py
+```
+
+脚本会自动处理：
+
+| 问题 | 处理方式 |
+|---|---|
+| 外链图片会过期 | 下载到 `static/images/`，正文替换为 `/images/xxx.png` |
+| 没有 front matter | 自动生成 title / date / slug / summary |
+| H1 与 title 重复 | 提取 H1 作为标题，并从正文移除 |
+| 文件名带 Notion ID | 去掉尾部十六进制 ID |
+| 中文标题无英文 slug | 回退为 `日期-序号`，如 `2026-09-26-1` |
+
+**5. 检查并发布**
+
+```bash
+../.tools/hugo server --buildDrafts   # 本地预览
+git add . && git commit -m "post: 新增文章" && git push
+```
+
+**关于 slug（URL 地址）**
+
+中文标题无法生成有意义的英文 slug，脚本会回退成 `2026-09-26-1` 这种形式。
+如果想用可读的 URL，**在 Notion 页面里加一行 front matter 风格的内容**：
+
+````markdown
+slug: my-first-post
+
+# 我的第一篇技术笔记
+
+正文……
+````
+
+脚本会识别 `slug:` 行并使用它。（放在 Notion 页面的最开头，用代码块或纯文本都行。）
+
 ### 发布
 
 ```bash
@@ -109,10 +174,14 @@ git push
 my-blog/
 ├── content/
 │   ├── posts/            # 文章都放这里
-│   ├── archives.md       # 归档页
 │   └── search.md         # 搜索页
+├── layouts/              # 覆盖主题的模板（首页、详情页、页脚、头部）
+├── assets/css/extended/  # 自定义样式（自动加载，不改主题源码）
+├── tools/
+│   └── notion_import.py  # Notion 导出转换脚本
+├── _inbox/               # Notion 导入暂存区（内容不提交）
 ├── themes/PaperMod/      # 主题（git submodule）
-├── static/               # 图片等静态资源，放 static/images/
+├── static/               # 静态资源；图片放 static/images/
 ├── hugo.yaml             # 全局配置
 └── .github/workflows/
     └── deploy.yml        # 自动部署脚本

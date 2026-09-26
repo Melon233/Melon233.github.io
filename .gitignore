@@ -13,3 +13,9 @@ Thumbs.db
 *.swp
 _melon-preview.png
 _favicon-sizes.png
+
+# Notion 导入暂存区
+# 只保留目录本身与说明文件，导出进来的原始内容不提交
+_inbox/*
+!_inbox/.gitkeep
+!_inbox/README.md
